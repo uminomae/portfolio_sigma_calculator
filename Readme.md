@@ -1,9 +1,13 @@
 # ポートフォリオの相関分析　
 ![alt text](sample_correlation_heatmap.png)
 
+## TODO
+- ポートフォリオの標準偏差を計算する機能
+
 ## 　使い方 
 
-- ダウンロードしたら、まず保存したディレクトリに移動してください。 
+- パソコンのお好きな場所にダウンロードして、ディレクトリに移動してください。 
+![alt text](dir.png)
 - `input.txt`ファイルを開いて、`名称,wealthadvisorの銘柄ページのURL`の順で編集してください。 
   - 例:ｅＭＡＸＩＳ　Ｓｌｉｍ　米国株式（Ｓ＆Ｐ５００）,https://www.wealthadvisor.co.jp/FundData/SnapShot.do?fnc=2018070301
 ![alt text](example_input.png)
