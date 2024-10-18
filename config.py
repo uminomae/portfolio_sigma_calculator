@@ -34,7 +34,7 @@ RISK_FREE_RATE = 0.02  # 年間2%のリスクフリーレートを仮定
 # 入出力
 # ---------------------------------
 # wealthadvisor.co.jpのURLを記述するファイル
-INPUT_FILE = 'input.txt'
+INPUT_FILE = 'input.csv'
 
 # 処理した内容の保存先ディレクトリ　※相関行列の画像など
 CSV_DIR = 'dl_data'
@@ -51,8 +51,9 @@ OUTPUT_FILE = 'output.csv'
 APP_NAME = "Portfolio Sigma Calculator"
 
 # Debug mode flag
-# DEBUG = True
-DEBUG = False
+PRINT_DEBUG = True
+LOG_DEBUG = False
+# LOG_DEBUG = True
 
 # HTTP request headers
 HEADERS = {

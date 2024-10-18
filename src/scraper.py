@@ -2,15 +2,14 @@
 
 # HTTP リクエストを行うためのライブラリをインポート
 import requests
-
 # HTML 解析のためのライブラリをインポート
 from bs4 import BeautifulSoup
-
 # 型ヒントのためのインポート
 from typing import Tuple
-
 # 設定ファイルから定数をインポート
-from config import HEADERS, DEBUG
+from config import HEADERS, START_YEAR, START_MONTH, END_YEAR, END_MONTH
+from src.utils import log_debug, print_debug
+
 
 import os
 import time
@@ -18,55 +17,74 @@ from urllib.parse import urljoin
 from urllib.parse import urljoin, urlparse, parse_qs
 import re
 import codecs
-
-from config import START_YEAR, START_MONTH, END_YEAR, END_MONTH
+# from config import 
 
 def scrape_fund_data(url: str) -> Tuple[str, str, str, str]:
     try:
+        # セッションを開始する
         session = requests.Session()
+        
+        # ヘッダーを付けてURLからデータを取得する
         response = session.get(url, headers=HEADERS)
+        
+        # ステータスコードが200以外の場合は例外を発生させる
         response.raise_for_status()
+        
+        # 取得したHTMLを解析する
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        if DEBUG:
-            print(f"\nAnalyzing URL: {url}")
+        # デバッグモードがオンの場合、解析中のURLを表示する
         
+        log_debug(f"\nAnalyzing URL: {url}")
+        
+        # ファンド名を取得し、その取得方法も一緒に返す
         fund_name, fund_name_method = find_fund_name(soup)
+        
+        # パフォーマンス情報を取得する
         performance = find_performance(soup)
         
+        # ダウンロードリンクを探す ('Download.do?fnc=' を含むリンクを検索)
         download_link = soup.find('a', href=lambda x: x and 'Download.do?fnc=' in x)
+        
+        # ダウンロードリンクが見つかった場合、そのページのURLを作成し、CSVファイルをダウンロードする
         if download_link:
             download_page_url = urljoin(url, download_link['href'])
+            
+            # navigate_and_download関数を使ってCSVをダウンロードし、保存先のパスを取得
             csv_path = navigate_and_download(session, download_page_url, fund_name, 
                                              start_year=START_YEAR, start_month=START_MONTH,
                                              end_year=END_YEAR, end_month=END_MONTH)
         else:
+            # ダウンロードリンクが見つからなかった場合の処理
             csv_path = "Download link not found"
         
+        # ファンド名、取得方法、パフォーマンス、CSVの保存パスを返す
         return fund_name, fund_name_method, performance, csv_path
 
+    # リクエスト時にエラーが発生した場合の例外処理
     except requests.RequestException as e:
         return f"Error: {str(e)}", "Error", "Error", "Error"
+
     
     
 def navigate_and_download(session: requests.Session, download_page_url: str, fund_name: str, 
                           start_year: int, start_month: int, end_year: int, end_month: int) -> str:
     try:
-        if DEBUG:
-            print(f"Navigating to download page: {download_page_url}")
+        
+        log_debug(f"Navigating to download page: {download_page_url}")
         
         response = session.get(download_page_url, headers=HEADERS)
         response.raise_for_status()
         download_page_soup = BeautifulSoup(response.text, 'html.parser')
 
-        if DEBUG:
-            print("Download page HTML content:")
-            print(download_page_soup.prettify()[:1000])
+        
+        log_debug("Download page HTML content:")
+        log_debug(download_page_soup.prettify()[:1000])
 
         download_form = download_page_soup.find('form', {'name': 'MSFD1101Bean', 'action': lambda x: x and 'DownloadRetYm.do' in x})
         if download_form:
-            if DEBUG:
-                print("Download form found")
+            
+            log_debug("Download form found")
             form_url = urljoin(download_page_url, download_form['action'])
             
             form_data = {}
@@ -88,28 +106,28 @@ def navigate_and_download(session: requests.Session, download_page_url: str, fun
 
             download_button = download_form.find('input', type='image', alt='ダウンロード')
             if download_button:
-                if DEBUG:
-                    print(f"Download button found: {download_button}")
+                
+                log_debug(f"Download button found: {download_button}")
                 button_name = download_button.get('name', 'download')
                 form_data[f'{button_name}.x'] = '1'
                 form_data[f'{button_name}.y'] = '1'
             else:
-                if DEBUG:
-                    print("Warning: Download button not found in the form")
+                
+                log_debug("Warning: Download button not found in the form")
 
-            if DEBUG:
-                print(f"Form URL: {form_url}")
-                print(f"Form data: {form_data}")
+            
+            log_debug(f"Form URL: {form_url}")
+            log_debug(f"Form data: {form_data}")
 
             return download_csv(session, form_url, form_data, fund_name, download_page_url)
         else:
-            if DEBUG:
-                print("Download form not found on the download page")
+            
+            log_debug("Download form not found on the download page")
             return "Download form not found on the download page"
 
     except requests.RequestException as e:
-        if DEBUG:
-            print(f"Error navigating to download page: {str(e)}")
+        
+        log_debug(f"Error navigating to download page: {str(e)}")
         return f"Error navigating to download page: {str(e)}"
 
 def download_csv(session: requests.Session, url: str, form_data: dict, fund_name: str, referer: str) -> str:
@@ -120,55 +138,55 @@ def download_csv(session: requests.Session, url: str, form_data: dict, fund_name
         headers['Origin'] = 'https://www.wealthadvisor.co.jp'
         headers['Upgrade-Insecure-Requests'] = '1'
 
-        if DEBUG:
-            print(f"Sending POST request to: {url}")
-            print(f"Headers: {headers}")
-            print(f"Form data: {form_data}")
+        
+        log_debug(f"Sending POST request to: {url}")
+        log_debug(f"Headers: {headers}")
+        log_debug(f"Form data: {form_data}")
 
         response = session.post(url, data=form_data, headers=headers, allow_redirects=True)
         response.raise_for_status()
 
-        if DEBUG:
-            print(f"Response status code: {response.status_code}")
-            print(f"Response headers: {response.headers}")
-            print(f"Content type: {response.headers.get('Content-Type')}")
+        
+        log_debug(f"Response status code: {response.status_code}")
+        log_debug(f"Response headers: {response.headers}")
+        log_debug(f"Content type: {response.headers.get('Content-Type')}")
 
         content_type = response.headers.get('Content-Type', '').lower()
         if 'text/csv' in content_type or 'application/csv' in content_type or 'application/octet-stream' in content_type:
             return save_csv_file(response, fund_name)
         elif 'text/html' in content_type:
             soup = BeautifulSoup(response.content, 'html.parser')
-            if DEBUG:
-                print("Response HTML content:")
-                print(soup.prettify()[:1000])  # Print first 1000 characters of HTML for debugging
+            
+            log_debug("Response HTML content:")
+            log_debug(soup.prettify()[:1000])  # Print first 1000 characters of HTML for debugging
             
             error_message = soup.find('div', class_='error-message')
             if error_message:
-                if DEBUG:
-                    print(f"Error message found in response: {error_message.text.strip()}")
+                
+                log_debug(f"Error message found in response: {error_message.text.strip()}")
                 return f"Error: {error_message.text.strip()}"
             
             # Check if there's a download link in the HTML
             download_link = soup.find('a', href=re.compile(r'.*\.csv$'))
             if download_link:
-                if DEBUG:
-                    print(f"Found CSV download link: {download_link['href']}")
+                
+                log_debug(f"Found CSV download link: {download_link['href']}")
                 csv_url = urljoin(url, download_link['href'])
                 return download_csv_file(session, csv_url, fund_name, url)
             
-            if DEBUG:
-                print("No CSV download link found in the HTML response")
+            
+            log_debug("No CSV download link found in the HTML response")
             return f"Error: Expected CSV, but got HTML. Check the HTML content for more information."
         else:
             return f"Error: Unexpected content type: {content_type}"
 
     except requests.RequestException as e:
-        if DEBUG:
-            print(f"Error downloading CSV: {str(e)}")
+        
+        log_debug(f"Error downloading CSV: {str(e)}")
         return f"Error downloading CSV: {str(e)}"
     except Exception as e:
-        if DEBUG:
-            print(f"Unexpected error: {str(e)}")
+        
+        log_debug(f"Unexpected error: {str(e)}")
         return f"Unexpected error: {str(e)}"
 
 def save_csv_file(response, fund_name: str) -> str:
@@ -203,13 +221,13 @@ def save_csv_file(response, fund_name: str) -> str:
         with codecs.open(filepath, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        if DEBUG:
-            print(f"File saved to: {filepath} with UTF-8 encoding")
+        
+        log_debug(f"File saved to: {filepath} with UTF-8 encoding")
         
         return filepath
     except Exception as e:
-        if DEBUG:
-            print(f"Error saving file: {str(e)}")
+        
+        log_debug(f"Error saving file: {str(e)}")
         return f"Error saving file: {str(e)}"
 
 
@@ -268,24 +286,22 @@ def find_performance(soup: BeautifulSoup) -> str:
             if len(cells) >= 2:
                 # 2つ目のセルのテキストを取得し、前後の空白を削除
                 performance = cells[1].text.strip()
-    
-    # デバッグモードが有効な場合
-    if DEBUG:
+        
         # パフォーマンス値が見つからなかった場合
         if performance == "Performance not found":
-            print("Performance value not found in the expected location")
+            log_debug("Performance value not found in the expected location")
         else:
             # パフォーマンス値が見つかった場合
-            print(f"Found performance value: {performance}")
+            log_debug(f"Found performance value: {performance}")
         
         # 2つ目のテーブルの構造を出力
-        print("\nStructure of the second table:")
+        log_debug("\nStructure of the second table:")
         if len(tables) >= 2:
             # 各行の内容を出力
             for i, row in enumerate(tables[1].find_all('tr')):
-                print(f"Row {i}: {' | '.join(cell.text.strip() for cell in row.find_all(['th', 'td']))}")
+                log_debug(f"Row {i}: {' | '.join(cell.text.strip() for cell in row.find_all(['th', 'td']))}")
         else:
-            print("Second table not found")
+            log_debug("Second table not found")
     
     # 取得したパフォーマンス値を返す
     return performance

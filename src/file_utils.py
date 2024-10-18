@@ -1,6 +1,7 @@
 # portfolio_sigma_calculator/src/file_utils.py
 import csv
 from typing import List, Tuple
+from config import OUTPUT_FILE
 
 def read_urls(file_path: str) -> List[Tuple[str, str]]:
     with open(file_path, 'r') as f:
@@ -11,3 +12,6 @@ def write_results(output_file: str, results: List[Tuple[str, str, str, str, str]
         writer = csv.writer(f)
         writer.writerow(['Original Name', 'URL', 'Scraped Fund Name', 'Performance'])
         writer.writerows(results)
+
+    # 結果が保存されたことを出力
+    print(f"Results saved to {OUTPUT_FILE}")

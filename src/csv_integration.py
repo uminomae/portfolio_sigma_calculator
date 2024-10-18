@@ -4,11 +4,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import List
+import numpy as np
+from src.utils import log_debug, print_debug
+
 from matplotlib.colors import Normalize
 from config import CSV_DIR
-import numpy as np  # Import NumPy library
-
-
 
 def generate_heatmap(dataframes: List[pd.DataFrame], csv_dir: str):
     if not dataframes:
@@ -18,6 +18,11 @@ def generate_heatmap(dataframes: List[pd.DataFrame], csv_dir: str):
     combined_df.fillna(0, inplace=True)  # 欠損値を0で埋める
     correlation_matrix = combined_df.corr()  # 相関行列を計算
 
+    # 相関行列をCSVファイルに出力
+    correlation_csv_path = os.path.join(csv_dir, 'correlation_matrix.csv')
+    correlation_matrix.to_csv(correlation_csv_path)
+    print_debug(f"Correlation matrix saved as '{correlation_csv_path}'")
+    
     # 相関行列をヒートマップとして可視化
     plt.figure(figsize=(12, 10))
     ax = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1, center=0,
@@ -38,3 +43,8 @@ def generate_heatmap(dataframes: List[pd.DataFrame], csv_dir: str):
     plt.close()
 
     combined_df.to_csv(os.path.join(csv_dir, 'combined_returns.csv'))
+
+    # if DEBUG:
+    print_debug("Correlation matrix created and saved as 'correlation_heatmap.png'")
+    log_debug("Combined returns data saved as 'combined_returns.csv'")
+    
