@@ -13,8 +13,14 @@
 # ---------------------------------
 
 # 開始年月設定
-START_YEAR = 2021
-START_MONTH = 9
+# START_YEAR = 2021
+# START_MONTH = 10
+START_YEAR = 2024
+START_MONTH = 1
+
+# 個人用
+# START_YEAR = 2021
+# START_MONTH = 6
 
 # 終了年月設定
 END_YEAR = 2024
@@ -23,7 +29,6 @@ END_MONTH = 9
 
 # ---------------------------------------------------------------------------------------------------
 
-
 # ---------------------------------
 # ポートフォリオ計算用の定数
 # ---------------------------------
@@ -31,17 +36,20 @@ END_MONTH = 9
 RISK_FREE_RATE = 0.02  # 年間2%のリスクフリーレートを仮定
 
 # ---------------------------------
-# 入出力
+# 入出力先
 # ---------------------------------
-# wealthadvisor.co.jpのURLを記述するファイル
+# 計算に必要な情報（wealthadvisor.co.jpのURLなど）を記述するファイル
 INPUT_FILE = 'input.csv'
+# INPUT_FILE = 'input2.csv'
 
 # 処理した内容の保存先ディレクトリ　※相関行列の画像など
-CSV_DIR = 'dl_data'
+CSV_DIR = 'reports'
 
 # 処理内容を確認するためのファイル
 OUTPUT_FILE = 'output.csv'
 
+
+# ---------------------------------------------------------------------------------------------------
 
 # ---------------------------------
 # デバッグなど
@@ -49,6 +57,9 @@ OUTPUT_FILE = 'output.csv'
 
 # アプリケーション名
 APP_NAME = "Portfolio Sigma Calculator"
+
+# Test
+RUN_TEST = True
 
 # Debug mode flag
 PRINT_DEBUG = True
