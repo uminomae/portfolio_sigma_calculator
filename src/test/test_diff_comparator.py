@@ -3,7 +3,7 @@ from src.utils import log_debug, print_debug, print_error
 import pandas as pd
 from pathlib import Path
 import os
-from config import OUTPUT_FILE, PRINT_DEBUG, LOG_DEBUG, RUN_TEST
+from config import DEBUG_LIST_URLS, PRINT_DEBUG, LOG_DEBUG, RUN_TEST
 
 def compare_csv_files(file1, file2):
     try:

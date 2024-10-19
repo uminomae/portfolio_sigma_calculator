@@ -42,11 +42,11 @@ RISK_FREE_RATE = 0.02  # 年間2%のリスクフリーレートを仮定
 INPUT_FILE = 'input.csv'
 # INPUT_FILE = 'input2.csv'
 
-# 処理した内容の保存先ディレクトリ　※相関行列の画像など
+# 処理結果の保存先ディレクトリ　※相関行列の画像など
 CSV_DIR = 'reports'
 
 # 処理内容を確認するためのファイル
-OUTPUT_FILE = 'output.csv'
+DEBUG_LIST_URLS = 'log/debug_list_of_processed_urls.csv'
 
 
 # ---------------------------------------------------------------------------------------------------
@@ -63,8 +63,8 @@ RUN_TEST = True
 
 # Debug mode flag
 PRINT_DEBUG = True
-LOG_DEBUG = False
-# LOG_DEBUG = True
+# LOG_DEBUG = False
+LOG_DEBUG = True
 
 # HTTP request headers
 HEADERS = {

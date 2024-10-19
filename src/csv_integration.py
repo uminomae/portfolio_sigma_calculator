@@ -44,7 +44,6 @@ def generate_heatmap(dataframes: List[pd.DataFrame], csv_dir: str):
 
     combined_df.to_csv(os.path.join(csv_dir, 'combined_returns.csv'))
 
-    # if DEBUG:
     print_debug("Correlation matrix created and saved as 'correlation_heatmap.png'")
     log_debug("Combined returns data saved as 'combined_returns.csv'")
     

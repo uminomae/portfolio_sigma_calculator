@@ -22,7 +22,6 @@ logger.addHandler(error_handler)
 
 def print_error(message: str) -> None:
     """デバッグメッセージを出力する。DEBUGがTrueの場合のみ表示。"""
-    # print(message)
     print(message, file=sys.stderr)
     logger.error(message)
 
@@ -35,5 +34,3 @@ def log_debug(message: str) -> None:
     """ """
     if LOG_DEBUG:
         logging.debug(message)
-    # if LOG_DEBUG:
-    #     print(message)

@@ -37,8 +37,6 @@ def fetch_page_content(session: requests.Session, url: str, headers: dict) -> re
 def find_fund_name(soup: BeautifulSoup) -> Tuple[str, str]:
     # デフォルト値を設定
     fund_name = "Fund name not found"
-    fund_name_method = "Failed"
-
     # すべての h1 タグを取得
     h1_elements = soup.find_all('h1')
 
@@ -46,9 +44,7 @@ def find_fund_name(soup: BeautifulSoup) -> Tuple[str, str]:
     if h1_elements:
         # 最初の h1 タグのテキストを取得し、前後の空白を削除
         fund_name = h1_elements[0].text.strip()
-        fund_name_method = "h1 tag"
 
-    # 結果を返す
     return fund_name
 
 # ダウンロードリンクを処理する
@@ -112,6 +108,7 @@ def scrape_fund_data(url: str) -> Tuple[str, str, str]:
     """ ファンドデータをスクレイプするメイン関数 """
     try:
         log_debug(f"\nAnalyzing URL: {url}")
+        print_debug(f"\nAnalyzing URL: {url}")
         # セッションを開始する
         session = requests.Session()
         # ページコンテンツの取得

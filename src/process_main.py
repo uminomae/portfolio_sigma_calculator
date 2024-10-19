@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from typing import List, Tuple
-from config import INPUT_FILE, OUTPUT_FILE, CSV_DIR
+from config import INPUT_FILE, DEBUG_LIST_URLS, CSV_DIR
 from src.file_utils import read_urls, debug_write_results
 from src.scraper import scrape_fund_data
 import matplotlib.pyplot as plt
@@ -26,6 +26,7 @@ def process_fund_data(original_name: str, url: str) -> Tuple[str, str, str]:
     log_debug(f"  Fund Name: {fund_name}")
     log_debug(f"  Performance: {performance}")
     log_debug(f"  CSV File: {csv_path}\n")
+    print_debug(f"  CSV File: {csv_path}\n")
     # 取得したデータをリターン
     return fund_name, performance, csv_path
 
