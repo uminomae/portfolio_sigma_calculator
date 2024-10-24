@@ -69,9 +69,9 @@ def process_urls(url_data: List[Tuple[str, str]]) -> List[Tuple[str, str, str, s
     results = []
     # ヒートマップ生成のために、DataFrameを格納するリスト
     dataframes = []
+
     # 削除するCSVファイルのパスを格納するリスト
     csv_files_to_delete = []
-
     # URLデータのリストをループ処理
     for original_name, url in url_data:
         # サブ関数でファンドデータを処理し、その結果を受け取る
